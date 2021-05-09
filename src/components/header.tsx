@@ -45,7 +45,7 @@ const Header = ({ siteTitle }: HeaderProps) => {
     <div className={classes.root}>
       <AppBar className={islit ? 'day' : 'dark'} position="static" >
         <Toolbar>
-          <a href="https://github.com/Mahmedabid/Contentful-Blog" target="blank">
+          <a href="https://github.com/Mahmedabid/todo" target="blank">
             <GitHubIcon style={{ fontSize: '40px', color: 'white' }} />
           </a>
           <Typography variant="h1" className={classes.title}>

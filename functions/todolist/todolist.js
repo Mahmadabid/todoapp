@@ -48,7 +48,7 @@ const resolvers = {
         const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
 
         const result = await client.query(
-          q.Create(q.Collection('Todo'),
+          q.Create(q.Collection('todo'),
             {
               data: {
                 task: task,
@@ -58,7 +58,7 @@ const resolvers = {
           )
         );
         console.log(result);
-        return result;
+        return result.ref.data;
       }
       catch (err) {
         console.log(err);

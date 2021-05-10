@@ -8,7 +8,7 @@ import TextField from '@material-ui/core/TextField';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { useSelector } from "react-redux";
 import { State } from "../Global/Types/SliceTypes";
-// import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Task from "../components/Task";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -73,18 +73,25 @@ const IndexPage = () => {
   const islit = useSelector((state: State) => state.themes.value);
   const matches = useMediaQuery('(max-width:380px)');
   const [value, setValue] = useState("");
-  const [AddTodo] = useMutation(ADD_TODO);
-  // const [isLoading, setLoading] = useState(false);
+  const [AddTodo, { loading: AddLoading }] = useMutation(ADD_TODO);
+  const [CheckLoading, setCheckLoading] = useState(false);
+  const [DelLoading, setDelLoading] = useState(false);
+  const [UpdateLoading, setUpdateLoading] = useState(false);
+  const [Error, setError] = useState(false);
 
   const AddTask = (event: React.FormEvent) => {
     event.preventDefault();
-    AddTodo({
-      variables: {
-        task: value
-      },
-      refetchQueries: [{ query: GET_TODO }]
-    })
-    setValue('');
+    if (value === "") {
+      setError(true);
+    } else {
+      AddTodo({
+        variables: {
+          task: value
+        },
+        refetchQueries: [{ query: GET_TODO }]
+      })
+      setValue('');
+    }
   }
 
   if (loading) {
@@ -105,26 +112,31 @@ const IndexPage = () => {
     );
   }
 
-  // const Load = () => {
-  //   return (
-  //     <div className="loading">
-  //       <CircularProgress />
-  //     </div>
-  //   )
-  // }
+  const Load = () => {
+    return (
+      <div className="loading">
+        <CircularProgress />
+      </div>
+    )
+  }
+
   if (data) {
     return (
       <Layout>
         <SEO title="Home" />
+        {AddLoading || CheckLoading || DelLoading || UpdateLoading ?
+          <Load />
+          :
+          null}
         <form onSubmit={AddTask}>
           <div className="main">
-            <TextField className={classes.input} onChange={(e) => setValue(e.target.value)} value={value} id="outlined-basic" label="Add Task" variant="outlined" />
+            <TextField className={classes.input} error={Error} helperText={Error ? 'Empty field!' : ' '} onChange={(e) => setValue(e.target.value)} value={value} id="outlined-basic" label="Add Task" variant="outlined" />
             <Button type="submit" className={`button ${classes.button}`} variant="contained" color="primary">ADD TASK</Button>
           </div>
         </form>
         { data.todos && data.todos.map((info: Info, index: number) =>
           <List key={index} className={`${matches ? classes.rootQuery : classes.root} ${classes.list} ${islit ? classes.LightList : ''} `}>
-            <Task date={info.date} task={info.task} id={info.id} status={info.status} />
+            <Task setCheckLoading={setCheckLoading} setDelLoading={setDelLoading} setUpdateLoading={setUpdateLoading} date={info.date} task={info.task} id={info.id} status={info.status} />
           </List>
         )
         }

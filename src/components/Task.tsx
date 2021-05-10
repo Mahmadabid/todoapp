@@ -1,6 +1,6 @@
 import React
-// , { Dispatch, SetStateAction } 
-from 'react';
+, { Dispatch, SetStateAction }
+    from 'react';
 import { IconButton, ListItem, ListItemText } from '@material-ui/core';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -16,7 +16,9 @@ interface TaskProps {
     id: any
     status: boolean
     date: string,
-    // setLoading: Dispatch<SetStateAction<boolean>>
+    setCheckLoading: Dispatch<SetStateAction<boolean>>
+    setUpdateLoading: Dispatch<SetStateAction<boolean>>
+    setDelLoading: Dispatch<SetStateAction<boolean>>
 }
 
 const DEL_TODO = gql`
@@ -45,41 +47,52 @@ const UPDATE_TODO = gql`
     }
 `;
 
-const Task: React.FC<TaskProps> = ({ task, id, status, date }) => {
+const Task: React.FC<TaskProps> = ({ setCheckLoading, setDelLoading, setUpdateLoading, task, id, status, date }) => {
 
-    const [delTodo] = useMutation(DEL_TODO);
-    const [checkTodo] = useMutation(CHECK_TODO);
-    const [updateTodo] = useMutation(UPDATE_TODO);
+    const [delTodo, { loading: delloading }] = useMutation(DEL_TODO);
+    const [checkTodo, { loading: checkloading }] = useMutation(CHECK_TODO);
+    const [updateTodo, { loading: updateloading }] = useMutation(UPDATE_TODO);
+
+    React.useEffect(() => {
+        setCheckLoading(checkloading);
+        setDelLoading(delloading);
+        setUpdateLoading(updateloading);
+    }, [checkloading, delloading, updateloading])
 
     const DelTask = () => {
         delTodo({
             variables: {
-              id,
+                id,
             },
             refetchQueries: [{ query: GET_TODO }],
-          });
+        });
     }
-    
+
     const CheckTask = () => {
         status = !status
         checkTodo({
             variables: {
-              id,
-              status
+                id,
+                status
             },
             refetchQueries: [{ query: GET_TODO }],
-          });
+        });
     }
 
     const UpdateTask = () => {
-        const value = prompt("Enter new name")
-        updateTodo({
-            variables: {
-              id,
-              task: value
-            },
-            refetchQueries: [{ query: GET_TODO }],
-          });
+        const value = prompt("Enter new name");
+        if (value === "") {
+            alert("Enter a value");
+        }
+        else {
+            updateTodo({
+                variables: {
+                    id,
+                    task: value
+                },
+                refetchQueries: [{ query: GET_TODO }],
+            });
+        }
     }
 
     return (
@@ -87,8 +100,8 @@ const Task: React.FC<TaskProps> = ({ task, id, status, date }) => {
             <IconButton onClick={CheckTask} color="inherit">
                 {status ? <Favorite color="primary" /> : <FavoriteBorder />}
             </IconButton>
-            <ListItemText primary={task} secondary={date}/>
-            <EditIcon style={{marginRight: '20px', cursor: 'pointer'}} onClick={UpdateTask}/>
+            <ListItemText primary={task} secondary={date} />
+            <EditIcon style={{ marginRight: '20px', cursor: 'pointer' }} onClick={UpdateTask} />
             <FormControlLabel
                 control={
                     <Checkbox

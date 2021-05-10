@@ -7,7 +7,7 @@ import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import EditIcon from '@material-ui/icons/Edit';
-import { GET_TODO } from '../pages/todo';
+import { GET_TODO } from './TaskBox';
 
 interface TaskProps {
     task: string

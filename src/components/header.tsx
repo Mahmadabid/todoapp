@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Link } from "gatsby"
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -78,13 +78,23 @@ const Header = ({ siteTitle }: HeaderProps) => {
   const dispatch = useDispatch();
   const islit = useSelector((state: State) => state.themes.value);
   const MenuMatch = useMediaQuery('(max-width:500px)');
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [User, setUser] = useState<any>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     netlifyIdentity.init({});
-  }, [])
+  })
 
-  const user = false;
+  netlifyIdentity.on("login", User => {
+    netlifyIdentity.close();
+    setUser(User);
+  })
+console.log(User);
+
+  netlifyIdentity.on("logout", () => {
+    netlifyIdentity.close();
+    setUser();
+  })
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -133,8 +143,8 @@ const Header = ({ siteTitle }: HeaderProps) => {
                   <ListItemText primary="DashBoard" />
                 </StyledMenuItem>
                 <StyledMenuItem>
-                  {user ?
-                    <ListItemText primary="Signout" />
+                  {User ?
+                    <ListItemText primary={User.user_metadata.full_name} />
                     :
                     <ListItemText onClick={() => {netlifyIdentity.open()}} primary="Signin" />
                   }
@@ -144,8 +154,8 @@ const Header = ({ siteTitle }: HeaderProps) => {
             :
             <>
               <Button className={classes.Button}>DashBoard</Button>
-              {user ?
-                <Button className={classes.Button}>LogOut</Button>
+              {User ?
+                <Button className={classes.Button}>{User.user_metadata.full_name}</Button>
                 :
                 <Button className={classes.Button} onClick={() => {netlifyIdentity.open()}}>LogIn</Button>
               }

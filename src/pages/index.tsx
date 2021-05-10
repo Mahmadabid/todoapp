@@ -1,4 +1,4 @@
-import * as React from "react"
+import React, { useState } from "react"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { useQuery, useMutation } from '@apollo/client';
@@ -9,6 +9,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { useSelector } from "react-redux";
 import { State } from "../Global/Types/SliceTypes";
 import Task from "../components/Task";
+// import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,13 +41,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 
 // This query is executed at run time by Apollo.
-const GET_TODO = gql`
+export const GET_TODO = gql`
 {
   todos {
     task,
     status,
     id,
-    date   
+    date,
   }
 }
 `;
@@ -71,8 +72,9 @@ const IndexPage = () => {
   const { loading, error, data } = useQuery(GET_TODO);
   const islit = useSelector((state: State) => state.themes.value);
   const matches = useMediaQuery('(max-width:380px)');
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = useState("");
   const [AddTodo] = useMutation(ADD_TODO);
+  // const [isLoading, setLoading] = useState(false);
 
   const AddTask = (event: React.FormEvent) => {
     event.preventDefault();
@@ -103,8 +105,14 @@ const IndexPage = () => {
     );
   }
 
+  // const Load = () => {
+  //   return (
+  //     <div className="loading">
+  //       <CircularProgress />
+  //     </div>
+  //   )
+  // }
   if (data) {
-    
     return (
       <Layout>
         <SEO title="Home" />
@@ -116,7 +124,7 @@ const IndexPage = () => {
         </form>
         { data.todos && data.todos.map((info: Info, index: number) =>
           <List key={index} className={`${matches ? classes.rootQuery : classes.root} ${classes.list} ${islit ? classes.LightList : ''} `}>
-            <Task date={info.date} GET_TODO={GET_TODO} task={info.task} id={info.id} status={info.status} />
+            <Task date={info.date} task={info.task} id={info.id} status={info.status} />
           </List>
         )
         }

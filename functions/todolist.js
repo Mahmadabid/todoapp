@@ -13,7 +13,7 @@ var objToday = new Date(),
 	curMinute = objToday.getMinutes() < 10 ? "0" + objToday.getMinutes() : objToday.getMinutes(),
 	curSeconds = objToday.getSeconds() < 10 ? "0" + objToday.getSeconds() : objToday.getSeconds()
 	
-  var today = curHour + ":" + curMinute + "." + curSeconds + " " + dayOfWeek.substring(0,3) + " " + curMonth.substring(0,3) + " " + dayOfMonth + " " + curYear;
+var today = curHour + ":" + curMinute + "." + curSeconds + " " + dayOfWeek.substring(0,3) + " " + curMonth.substring(0,3) + " " + dayOfMonth + " " + curYear;
 
 const typeDefs = gql`
   type Query {
@@ -50,7 +50,7 @@ const resolvers = {
             id: d.ref.id,
             task: d.data.task,
             status: d.data.status,
-            date: d.data.date
+            date: d.data.date,
           }
         })
       }

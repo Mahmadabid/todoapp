@@ -1,4 +1,6 @@
-import React from 'react';
+import React
+// , { Dispatch, SetStateAction } 
+from 'react';
 import { IconButton, ListItem, ListItemText } from '@material-ui/core';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -7,13 +9,14 @@ import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import EditIcon from '@material-ui/icons/Edit';
+import { GET_TODO } from '../pages';
 
 interface TaskProps {
     task: string
     id: any
     status: boolean
-    GET_TODO: any,
-    date: string
+    date: string,
+    // setLoading: Dispatch<SetStateAction<boolean>>
 }
 
 const DEL_TODO = gql`
@@ -42,7 +45,7 @@ const UPDATE_TODO = gql`
     }
 `;
 
-const Task: React.FC<TaskProps> = ({ task, id, status, GET_TODO, date }) => {
+const Task: React.FC<TaskProps> = ({ task, id, status, date }) => {
 
     const [delTodo] = useMutation(DEL_TODO);
     const [checkTodo] = useMutation(CHECK_TODO);
@@ -56,7 +59,7 @@ const Task: React.FC<TaskProps> = ({ task, id, status, GET_TODO, date }) => {
             refetchQueries: [{ query: GET_TODO }],
           });
     }
-
+    
     const CheckTask = () => {
         status = !status
         checkTodo({
@@ -85,7 +88,7 @@ const Task: React.FC<TaskProps> = ({ task, id, status, GET_TODO, date }) => {
                 {status ? <Favorite color="primary" /> : <FavoriteBorder />}
             </IconButton>
             <ListItemText primary={task} secondary={date}/>
-            <EditIcon style={{marginRight: '20px'}} onClick={UpdateTask}/>
+            <EditIcon style={{marginRight: '20px', cursor: 'pointer'}} onClick={UpdateTask}/>
             <FormControlLabel
                 control={
                     <Checkbox

@@ -13,6 +13,19 @@ h3, h1 {
     text-align: center;
 }
 
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(110, 102, 102, 0.397);
+    width: 100vw;
+    height: 100vh;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 @media screen and (max-width: 500px) {
     .main {
         flex-direction: column;

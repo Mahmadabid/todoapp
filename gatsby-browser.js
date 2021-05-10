@@ -3,8 +3,6 @@ import { Provider } from 'react-redux';
 import store from './src/Global/store';
 import { Theme } from "./src/Global/theme";
 import './src/Global/Global.css';
-import { client } from "./src/Apollo/client";
-
 
 export const wrapRootElement = ({ element }) => {
   

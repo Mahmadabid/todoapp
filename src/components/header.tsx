@@ -136,7 +136,7 @@ const Header = ({ siteTitle }: HeaderProps) => {
                   {user ?
                     <ListItemText primary="Signout" />
                     :
-                    <ListItemText primary="Signin" />
+                    <ListItemText onClick={() => {netlifyIdentity.open()}} primary="Signin" />
                   }
                 </StyledMenuItem>
               </StyledMenu>
@@ -147,7 +147,7 @@ const Header = ({ siteTitle }: HeaderProps) => {
               {user ?
                 <Button className={classes.Button}>LogOut</Button>
                 :
-                <Button className={classes.Button}>LogIn</Button>
+                <Button className={classes.Button} onClick={() => {netlifyIdentity.open()}}>LogIn</Button>
               }
             </>
           }

@@ -3,17 +3,17 @@ const faunadb = require('faunadb');
 const q = faunadb.query;
 
 var objToday = new Date(),
-	weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-	dayOfWeek = weekday[objToday.getDay()],
-	dayOfMonth = objToday.getDate(),
-	months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-	curMonth = months[objToday.getMonth()],
-	curYear = objToday.getFullYear(),
+  weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  dayOfWeek = weekday[objToday.getDay()],
+  dayOfMonth = objToday.getDate(),
+  months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  curMonth = months[objToday.getMonth()],
+  curYear = objToday.getFullYear(),
   curHour = objToday.getHours() > 12 ? objToday.getHours() - 12 : (objToday.getHours() < 10 ? "0" + objToday.getHours() : objToday.getHours()),
-	curMinute = objToday.getMinutes() < 10 ? "0" + objToday.getMinutes() : objToday.getMinutes(),
-	curSeconds = objToday.getSeconds() < 10 ? "0" + objToday.getSeconds() : objToday.getSeconds()
-	
-var today = curHour + ":" + curMinute + "." + curSeconds + " " + dayOfWeek.substring(0,3) + " " + curMonth.substring(0,3) + " " + dayOfMonth + " " + curYear;
+  curMinute = objToday.getMinutes() < 10 ? "0" + objToday.getMinutes() : objToday.getMinutes(),
+  curSeconds = objToday.getSeconds() < 10 ? "0" + objToday.getSeconds() : objToday.getSeconds()
+
+var today = curHour + ":" + curMinute + "." + curSeconds + " " + dayOfWeek.substring(0, 3) + " " + curMonth.substring(0, 3) + " " + dayOfMonth + " " + curYear;
 
 const typeDefs = gql`
   type Query {
@@ -35,32 +35,39 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    todos: async (root, args, context) => {
-      try {
-        const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
+    todos: async (root, args, { user }) => {
+      if (!user) {
+        return [];
+      } else {
+        try {
+          const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
 
-        const result = await client.query(
-          q.Map(
-            q.Paginate(q.Match(q.Index('todo_list'))),
-            q.Lambda(x => q.Get(x))
-          )
-        );
-        return result.data.reverse().map(d => {
-          return {
-            id: d.ref.id,
-            task: d.data.task,
-            status: d.data.status,
-            date: d.data.date,
-          }
-        })
+          const result = await client.query(
+            q.Map(
+              q.Paginate(q.Match(q.Index('todo_list'))),
+              q.Lambda(x => q.Get(x))
+            )
+          );
+          return result.data.reverse().map(d => {
+            return {
+              id: d.ref.id,
+              task: d.data.task,
+              status: d.data.status,
+              date: d.data.date,
+            }
+          })
+        }
+        catch (err) {
+          console.log(err);
+        }
       }
-      catch (err) {
-        console.log(err);
-      }
-    },  
+    },
   },
   Mutation: {
-    addTodo: async (_, { task }) => {
+    addTodo: async (_, { task }, { user }) => {
+      if (!user) {
+        throw new Error("Must be authenticated to insert todos");
+      }
       try {
         const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
 
@@ -86,7 +93,7 @@ const resolvers = {
         const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
 
         const result = await client.query(
-          q.Update(q.Ref(q.Collection('todo'), id) , 
+          q.Update(q.Ref(q.Collection('todo'), id),
             {
               data: {
                 task: task,
@@ -106,7 +113,7 @@ const resolvers = {
         const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
 
         const result = await client.query(
-          q.Delete(q.Ref(q.Collection('todo'), id)) 
+          q.Delete(q.Ref(q.Collection('todo'), id))
         );
       }
       catch (err) {
@@ -118,7 +125,7 @@ const resolvers = {
         const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
 
         const result = await client.query(
-          q.Update(q.Ref(q.Collection('todo'), id) , 
+          q.Update(q.Ref(q.Collection('todo'), id),
             {
               data: {
                 status
@@ -138,8 +145,17 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-})
-
-const handler = server.createHandler()
-
-module.exports = { handler }
+  context: ({ context }) => {
+    if (context.clientContext.user) {
+      return { user: context.clientContext.user.sub };
+    } else {
+      return {};
+    }
+  },
+});
+exports.handler = server.createHandler({
+  cors: {
+    origin: "*",
+    credentials: true,
+  },
+});

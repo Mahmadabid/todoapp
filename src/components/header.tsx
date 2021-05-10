@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { Link } from "gatsby"
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -16,7 +16,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
-import netlifyIdentity from "netlify-identity-widget";
+import { IdentityContext } from "../../netlifyIdentityContext";
 
 const StyledMenu = withStyles({
   paper: {
@@ -79,22 +79,7 @@ const Header = ({ siteTitle }: HeaderProps) => {
   const islit = useSelector((state: State) => state.themes.value);
   const MenuMatch = useMediaQuery('(max-width:500px)');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [User, setUser] = useState<any>();
-
-  useEffect(() => {
-    netlifyIdentity.init({});
-  })
-
-  netlifyIdentity.on("login", User => {
-    netlifyIdentity.close();
-    setUser(User);
-  })
-console.log(User);
-
-  // netlifyIdentity.on("logout", () => {
-  //   netlifyIdentity.close();
-  //   setUser();
-  // })
+  const { user, identity: netlifyIdentity } = useContext(IdentityContext);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -113,7 +98,7 @@ console.log(User);
     <div className={classes.root}>
       <AppBar className={islit ? 'day' : 'dark'} position="static" >
         <Toolbar>
-          <a href="https://github.com/Mahmedabid/todo" target="blank">
+          <a href="https://github.com/Mahmedabid/todoapp" target="blank">
             <GitHubIcon style={{ fontSize: '40px', color: 'white' }} />
           </a>
           <Typography variant="h1" className={classes.title}>
@@ -140,25 +125,21 @@ console.log(User);
                 onClose={handleClose}
               >
                 <StyledMenuItem>
-                  <ListItemText primary="DashBoard" />
+                  <Link to="todo" style={{textDecoration: "none"}}>
+                    <ListItemText primary="DashBoard" />
+                  </Link>
                 </StyledMenuItem>
                 <StyledMenuItem>
-                  {User ?
-                    <ListItemText primary={User.user_metadata.full_name} />
-                    :
-                    <ListItemText onClick={() => {netlifyIdentity.open()}} primary="Signin" />
-                  }
+                  <ListItemText onClick={() => { netlifyIdentity.open() }} primary={user ? user.user_metadata && user.user_metadata.full_name : "LogIn"} />
                 </StyledMenuItem>
               </StyledMenu>
             </>
             :
             <>
-              <Button className={classes.Button}>DashBoard</Button>
-              {User ?
-                <Button className={classes.Button}>{User.user_metadata.full_name}</Button>
-                :
-                <Button className={classes.Button} onClick={() => {netlifyIdentity.open()}}>LogIn</Button>
-              }
+              <Link to="todo" style={{textDecoration: "none"}}>
+                <Button className={classes.Button}>DashBoard</Button>
+              </Link>
+              <Button className={classes.Button} onClick={() => { netlifyIdentity.open() }}>{user ? user.user_metadata && user.user_metadata.full_name : "LogIn"}</Button>
             </>
           }
           <IconButton onClick={themeHandle} color="inherit" >
@@ -166,7 +147,7 @@ console.log(User);
           </IconButton>
         </Toolbar>
       </AppBar>
-    </div>
+    </div >
   );
 }
 

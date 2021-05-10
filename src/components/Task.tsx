@@ -1,6 +1,4 @@
-import React
-, { Dispatch, SetStateAction }
-    from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { IconButton, ListItem, ListItemText } from '@material-ui/core';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -9,7 +7,7 @@ import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import EditIcon from '@material-ui/icons/Edit';
-import { GET_TODO } from '../pages';
+import { GET_TODO } from '../pages/todo';
 
 interface TaskProps {
     task: string

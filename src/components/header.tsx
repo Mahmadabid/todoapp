@@ -91,10 +91,10 @@ const Header = ({ siteTitle }: HeaderProps) => {
   })
 console.log(User);
 
-  netlifyIdentity.on("logout", () => {
-    netlifyIdentity.close();
-    setUser();
-  })
+  // netlifyIdentity.on("logout", () => {
+  //   netlifyIdentity.close();
+  //   setUser();
+  // })
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

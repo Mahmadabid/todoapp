@@ -78,7 +78,8 @@ const resolvers = {
               data: {
                 task: task,
                 status: false,
-                date: today
+                date: today,
+                owner: user
               }
             }
           )

@@ -33,6 +33,7 @@ const typeDefs = gql`
     checkTodo(id: ID!, status: Boolean!): Todo
   }
 `
+const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
 const resolvers = {
   Query: {
@@ -41,8 +42,6 @@ const resolvers = {
         return [];
       } else {
         try {
-          const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
-
           const result = await client.query(
             q.Map(
               q.Paginate(q.Match(q.Index('todo_list'), user)),
@@ -70,8 +69,6 @@ const resolvers = {
         throw new Error("Must be authenticated to add todos");
       }
       try {
-        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
-
         const result = await client.query(
           q.Create(q.Collection('todo'),
             {
@@ -95,8 +92,6 @@ const resolvers = {
         throw new Error("Must be authenticated to add todos");
       }
       try {
-        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
-
         const result = await client.query(
           q.Update(q.Ref(q.Collection('todo'), id),
             {
@@ -118,8 +113,6 @@ const resolvers = {
         throw new Error("Must be authenticated to delete todos");
       }
       try {
-        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
-
         const result = await client.query(
           q.Delete(q.Ref(q.Collection('todo'), id))
         );
@@ -133,8 +126,6 @@ const resolvers = {
         throw new Error("Must be authenticated to add todos");
       }
       try {
-        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
-
         const result = await client.query(
           q.Update(q.Ref(q.Collection('todo'), id),
             {

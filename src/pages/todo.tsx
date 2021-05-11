@@ -3,14 +3,10 @@ import { IdentityContext } from "../../netlifyIdentityContext";
 import TaskBox from '../components/TaskBox';
 import Layout from '../components/layout';
 import SEO from '../components/seo';
-import { Button } from '@material-ui/core';
+import LogInButton from '../components/Login';
 
-interface TodoProps {
-  netlifyIdentity: {}
-}
+const LoggedOut = () => {
 
-const LoggedOut = ({netlifyIdentity}: TodoProps) => {
-  
   return (
     <Layout>
       <SEO title="Home" />
@@ -18,22 +14,24 @@ const LoggedOut = ({netlifyIdentity}: TodoProps) => {
         <h1>Oops!</h1>
         <p>You are not logged In.</p>
         <p>LogIn to create Todos</p>
-        <Button color="primary" variant="contained" onClick={() => { netlifyIdentity.open() }}>LogIn</Button>
+        <LogInButton />
       </div>
     </Layout>
   )
 }
 
 const todo = () => {
-  const { user, identity: netlifyIdentity } = useContext(IdentityContext);
+  const { user } = useContext(IdentityContext);
   if (!user) {
     return (
-        <LoggedOut netlifyIdentity={netlifyIdentity} />
+      <LoggedOut />
     );
   }
-  return (
-    <TaskBox />
-  )
+  else {
+    return (
+      <TaskBox />
+    )
+  }
 }
 
 export default todo;

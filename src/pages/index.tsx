@@ -4,9 +4,10 @@ import SEO from '../components/seo';
 import { IdentityContext } from "../../netlifyIdentityContext";
 import { Link } from 'gatsby';
 import { Button } from '@material-ui/core';
+import LogInButton from '../components/Login';
 
 const index = () => {
-  const { user, identity: netlifyIdentity } = useContext(IdentityContext);
+  const { user } = useContext(IdentityContext);
 
   if (!user) {
     return (
@@ -22,7 +23,7 @@ const index = () => {
             <li>You can delete.</li>
             <li>You can check.</li>
           </ul>
-          <Button color="primary" variant="contained" onClick={() => { netlifyIdentity.open() }}>LogIn</Button>
+          <LogInButton />
         </div>
       </Layout>
     )

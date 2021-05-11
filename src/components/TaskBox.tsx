@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react"
+import React, { useState } from "react"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { useQuery, useMutation } from '@apollo/client';
@@ -10,7 +10,6 @@ import { useSelector } from "react-redux";
 import { State } from "../Global/Types/SliceTypes";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Task from "../components/Task";
-import { IdentityContext } from "../../netlifyIdentityContext";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -79,7 +78,6 @@ const TaskBox= () => {
   const [DelLoading, setDelLoading] = useState(false);
   const [UpdateLoading, setUpdateLoading] = useState(false);
   const [Error, setError] = useState(false);
-  const { user } = useContext(IdentityContext);
 
   const AddTask = (event: React.FormEvent) => {
     event.preventDefault();

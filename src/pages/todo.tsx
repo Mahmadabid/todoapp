@@ -26,7 +26,7 @@ const todo = () => {
   if (!user) {
     return (
       <Router>
-        <LoggedOut path="/app" />
+        <LoggedOut path="/todo" />
       </Router>
     );
   }

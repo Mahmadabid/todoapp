@@ -1,6 +1,7 @@
 const { ApolloServer, gql } = require('apollo-server-lambda')
 const faunadb = require('faunadb');
 const q = faunadb.query;
+require("dotenv").config();
 
 var objToday = new Date(),
   weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -35,32 +36,39 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    todos: async (root, args, context) => {
-      try {
-        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
+    todos: async (parent, args, { user }) => {
+      if (!user) {
+        return [];
+      } else {
+        try {
+          const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
-        const result = await client.query(
-          q.Map(
-            q.Paginate(q.Match(q.Index('todo_list'))),
-            q.Lambda(x => q.Get(x))
-          )
-        );
-        return result.data.reverse().map(d => {
-          return {
-            id: d.ref.id,
-            task: d.data.task,
-            status: d.data.status,
-            date: d.data.date,
-          }
-        })
-      }
-      catch (err) {
-        console.log(err);
+          const result = await client.query(
+            q.Map(
+              q.Paginate(q.Match(q.Index('todo_list'))),
+              q.Lambda(x => q.Get(x))
+            )
+          );
+          return result.data.reverse().map(d => {
+            return {
+              id: d.ref.id,
+              task: d.data.task,
+              status: d.data.status,
+              date: d.data.date,
+            }
+          })
+        }
+        catch (err) {
+          console.log(err);
+        }
       }
     },
   },
   Mutation: {
-    addTodo: async (_, { task }) => {
+    addTodo: async (_, { task }, { user }) => {
+      if (!user) {
+        throw new Error("Must be authenticated to add todos");
+      }
       try {
         const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
@@ -81,7 +89,10 @@ const resolvers = {
         console.log(err);
       }
     },
-    updateTodo: async (_, { id, task }) => {
+    updateTodo: async (_, { id, task }, { user }) => {
+      if (!user) {
+        throw new Error("Must be authenticated to add todos");
+      }
       try {
         const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
@@ -101,7 +112,10 @@ const resolvers = {
         console.log(err);
       }
     },
-    delTodo: async (_, { id }) => {
+    delTodo: async (_, { id }, { user }) => {
+      if (!user) {
+        throw new Error("Must be authenticated to delete todos");
+      }
       try {
         const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
@@ -113,7 +127,10 @@ const resolvers = {
         console.log(err);
       }
     },
-    checkTodo: async (_, { id, status }) => {
+    checkTodo:  async (_, { id, status }, { user }) => {
+      if (!user) {
+        throw new Error("Must be authenticated to add todos");
+      }
       try {
         const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
@@ -138,8 +155,17 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-})
-
-const handler = server.createHandler()
-
-module.exports = { handler }
+  context: ({ context }) => {
+    if (context.clientContext.user) {
+      return { user: context.clientContext.user.sub };
+    } else {
+      return {};
+    }
+  },
+});
+exports.handler = server.createHandler({
+  cors: {
+    origin: "*",
+    credentials: true,
+  },
+});

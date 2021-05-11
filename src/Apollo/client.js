@@ -22,7 +22,7 @@ const authLink = setContext((_, {headers}) => {
 })
 
 const httpLink = new HttpLink({
-  uri: "/.netlify/functions/graphql"
+  uri: "/.netlify/functions/todolist"
   // uri: "https://ahm-todoapp.netlify.app/.netlify/functions/graphql"
 });
 

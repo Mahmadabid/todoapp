@@ -1,5 +1,5 @@
-const { ApolloServer, gql } = require('apollo-server-lambda')
-const faunadb = require('faunadb');
+const { ApolloServer, gql } = require("apollo-server-lambda");
+const faunadb = require("faunadb");
 const q = faunadb.query;
 require("dotenv").config();
 
@@ -16,6 +16,8 @@ var objToday = new Date(),
 
 var today = curHour + ":" + curMinute + "." + curSeconds + " " + dayOfWeek.substring(0, 3) + " " + curMonth.substring(0, 3) + " " + dayOfMonth + " " + curYear;
 
+const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
+
 const typeDefs = gql`
   type Query {
     todos: [Todo]!
@@ -28,43 +30,29 @@ const typeDefs = gql`
   }
   type Mutation {
     addTodo(task: String!): Todo
-    delTodo(id: ID!): Todo
     updateTodo(id: ID!, task: String!): Todo
     checkTodo(id: ID!, status: Boolean!): Todo
+    delTodo(id: ID!): Todo
   }
-`
-const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
+`;
 
 const resolvers = {
   Query: {
     todos: async (parent, args, { user }) => {
       if (!user) {
-        return {
-           id: "hhjjhhjjj56", 
-           task: "hi test", 
-           status: false, 
-           date: "ghj 2020",
-        } 
+        return [];
       } else {
-        try {
-          const result = await client.query(
-            q.Map(
-              q.Paginate(q.Match(q.Index('todo_list'), user)),
-              q.Lambda(x => q.Get(x))
-            )
-          );
-          return result.data.reverse().map(d => {
-            return {
-              id: d.ref.id,
-              task: d.data.task,
-              status: d.data.status,
-              date: d.data.date,
-            }
-          })
-        }
-        catch (err) {
-          console.log(err);
-        }
+        const results = await client.query(
+          q.Paginate(q.Match(q.Index("todo_list"), user))
+        );
+        return results.data.map(([ref, task, status, date]) => {
+          return {
+            id: ref.id,
+            task,
+            status,
+            date,
+          };
+        });
       }
     },
   },
@@ -73,81 +61,64 @@ const resolvers = {
       if (!user) {
         throw new Error("Must be authenticated to add todos");
       }
-      try {
-        const result = await client.query(
-          q.Create(q.Collection('todo'),
-            {
-              data: {
-                task: task,
-                status: false,
-                date: today,
-                owner: user
-              }
-            }
-          )
-        );
-        return result.ref.data
-      }
-      catch (err) {
-        console.log(err);
-      }
+      const results = await client.query(
+        q.Create(q.Collection("todo"), {
+          data: {
+            task,
+            status: false,
+            owner: user,
+            date: today,
+          },
+        })
+      );
+      return {
+        ...results.data,
+        id: results.ref.id,
+      };
     },
     updateTodo: async (_, { id, task }, { user }) => {
       if (!user) {
         throw new Error("Must be authenticated to add todos");
       }
-      try {
-        const result = await client.query(
-          q.Update(q.Ref(q.Collection('todo'), id),
-            {
-              data: {
-                task: task,
-                date: today
-              }
-            }
-          )
-        );
-        return result.ref.data
+      const results = await client.query(
+        q.Update(q.Ref(q.Collection("todo"), id), {
+          data: {
+            task,
+            date: today,
+          },
+        })
+      );
+      return {
+        ...results.data,
+        id: results.ref.id,
+      };
+    },
+    checkTodo: async (_, { id, status }, { user }) => {
+      if (!user) {
+        throw new Error("Must be authenticated to add todos");
       }
-      catch (err) {
-        console.log(err);
-      }
+      const results = await client.query(
+        q.Update(q.Ref(q.Collection("todo"), id), {
+          data: {
+            status
+          },
+        })
+      );
+      return {
+        ...results.data,
+        id: results.ref.id,
+      };
     },
     delTodo: async (_, { id }, { user }) => {
       if (!user) {
         throw new Error("Must be authenticated to delete todos");
       }
-      try {
-        const result = await client.query(
-          q.Delete(q.Ref(q.Collection('todo'), id))
-        );
-      }
-      catch (err) {
-        console.log(err);
-      }
-    },
-    checkTodo:  async (_, { id, status }, { user }) => {
-      if (!user) {
-        throw new Error("Must be authenticated to add todos");
-      }
-      try {
-        const result = await client.query(
-          q.Update(q.Ref(q.Collection('todo'), id),
-            {
-              data: {
-                status
-              }
-            }
-          )
-        );
-        return result.ref.data
-      }
-      catch (err) {
-        console.log(err);
-      }
+      const results = await client.query(
+        q.Delete(q.Ref(q.Collection("todo"), id))
+      );
     },
   },
-}
+};
 
 const server = new ApolloServer({
   typeDefs,

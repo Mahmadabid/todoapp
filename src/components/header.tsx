@@ -81,7 +81,6 @@ const Header = ({ siteTitle }: HeaderProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { user, identity: netlifyIdentity } = useContext(IdentityContext);
 
-console.log(user);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };

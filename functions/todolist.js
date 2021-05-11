@@ -39,12 +39,12 @@ const resolvers = {
   Query: {
     todos: async (parent, args, { user }) => {
       if (!user) {
-        return [];
+        return {} 
       } else {
         try {
           const result = await client.query(
             q.Map(
-              q.Paginate(q.Match(q.Index('todo_list'), user.id)),
+              q.Paginate(q.Match(q.Index('todo_list'), user)),
               q.Lambda(x => q.Get(x))
             )
           );

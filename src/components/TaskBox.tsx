@@ -143,6 +143,11 @@ const TaskBox= () => {
       </Layout >
     );
   }
+  else {
+    return (
+      <h1>Please Reload!</h1>
+    )
+  }
 }
 
 export default TaskBox;

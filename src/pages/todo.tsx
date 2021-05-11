@@ -4,7 +4,6 @@ import TaskBox from '../components/TaskBox';
 import Layout from '../components/layout';
 import SEO from '../components/seo';
 import LogInButton from '../components/Login';
-import { Router } from "@reach/router";
 
 const LoggedOut = () => {
 
@@ -25,9 +24,7 @@ const todo = () => {
   const { user } = useContext(IdentityContext);
   if (!user) {
     return (
-      <Router>
-        <LoggedOut path="/todo" />
-      </Router>
+      <LoggedOut />
     );
   }
   else {

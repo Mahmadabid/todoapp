@@ -3,17 +3,17 @@ const faunadb = require('faunadb');
 const q = faunadb.query;
 
 var objToday = new Date(),
-	weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-	dayOfWeek = weekday[objToday.getDay()],
-	dayOfMonth = objToday.getDate(),
-	months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-	curMonth = months[objToday.getMonth()],
-	curYear = objToday.getFullYear(),
+  weekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  dayOfWeek = weekday[objToday.getDay()],
+  dayOfMonth = objToday.getDate(),
+  months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  curMonth = months[objToday.getMonth()],
+  curYear = objToday.getFullYear(),
   curHour = objToday.getHours() > 12 ? objToday.getHours() - 12 : (objToday.getHours() < 10 ? "0" + objToday.getHours() : objToday.getHours()),
-	curMinute = objToday.getMinutes() < 10 ? "0" + objToday.getMinutes() : objToday.getMinutes(),
-	curSeconds = objToday.getSeconds() < 10 ? "0" + objToday.getSeconds() : objToday.getSeconds()
-	
-var today = curHour + ":" + curMinute + "." + curSeconds + " " + dayOfWeek.substring(0,3) + " " + curMonth.substring(0,3) + " " + dayOfMonth + " " + curYear;
+  curMinute = objToday.getMinutes() < 10 ? "0" + objToday.getMinutes() : objToday.getMinutes(),
+  curSeconds = objToday.getSeconds() < 10 ? "0" + objToday.getSeconds() : objToday.getSeconds()
+
+var today = curHour + ":" + curMinute + "." + curSeconds + " " + dayOfWeek.substring(0, 3) + " " + curMonth.substring(0, 3) + " " + dayOfMonth + " " + curYear;
 
 const typeDefs = gql`
   type Query {
@@ -37,7 +37,7 @@ const resolvers = {
   Query: {
     todos: async (root, args, context) => {
       try {
-        const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
+        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
         const result = await client.query(
           q.Map(
@@ -57,12 +57,12 @@ const resolvers = {
       catch (err) {
         console.log(err);
       }
-    },  
+    },
   },
   Mutation: {
     addTodo: async (_, { task }) => {
       try {
-        const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
+        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
         const result = await client.query(
           q.Create(q.Collection('todo'),
@@ -83,10 +83,10 @@ const resolvers = {
     },
     updateTodo: async (_, { id, task }) => {
       try {
-        const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
+        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
         const result = await client.query(
-          q.Update(q.Ref(q.Collection('todo'), id) , 
+          q.Update(q.Ref(q.Collection('todo'), id),
             {
               data: {
                 task: task,
@@ -103,10 +103,10 @@ const resolvers = {
     },
     delTodo: async (_, { id }) => {
       try {
-        const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
+        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
         const result = await client.query(
-          q.Delete(q.Ref(q.Collection('todo'), id)) 
+          q.Delete(q.Ref(q.Collection('todo'), id))
         );
       }
       catch (err) {
@@ -115,10 +115,10 @@ const resolvers = {
     },
     checkTodo: async (_, { id, status }) => {
       try {
-        const client = new faunadb.Client({ secret: "fnAEIslqRiACCEIQ8qnAeB0OxX0xpzz7cakZpbcw" });
+        const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
 
         const result = await client.query(
-          q.Update(q.Ref(q.Collection('todo'), id) , 
+          q.Update(q.Ref(q.Collection('todo'), id),
             {
               data: {
                 status

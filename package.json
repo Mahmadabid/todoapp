@@ -15,6 +15,7 @@
     "@types/react-redux": "^7.1.16",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
+    "apollo-link-context": "^1.0.20",
     "apollo-server-lambda": "^2.24.0",
     "cross-fetch": "^3.1.4",
     "dotenv": "^8.2.0",

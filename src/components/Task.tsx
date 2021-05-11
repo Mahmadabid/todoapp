@@ -11,7 +11,7 @@ import { GET_TODO } from './TaskBox';
 
 interface TaskProps {
     task: string
-    id: any
+    id: string
     status: boolean
     date: string,
     setCheckLoading: Dispatch<SetStateAction<boolean>>

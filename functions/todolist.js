@@ -45,7 +45,7 @@ const resolvers = {
 
           const result = await client.query(
             q.Map(
-              q.Paginate(q.Match(q.Index('todo_list'))),
+              q.Paginate(q.Match(q.Index('todo_list'), user)),
               q.Lambda(x => q.Get(x))
             )
           );

@@ -30,5 +30,4 @@ netlifyIdentity.on('logout', () =>{
     );
 };
 
-
 exports.Providers = IdentityProvider;

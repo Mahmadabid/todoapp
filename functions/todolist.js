@@ -39,7 +39,12 @@ const resolvers = {
   Query: {
     todos: async (parent, args, { user }) => {
       if (!user) {
-        return {} 
+        return {
+           id: "hhjjhhjjj56", 
+           task: "hi test", 
+           status: false, 
+           date: "ghj 2020",
+        } 
       } else {
         try {
           const result = await client.query(

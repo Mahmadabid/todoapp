@@ -23,7 +23,7 @@ const authLink = setContext((_, {headers}) => {
 
 const httpLink = new HttpLink({
   uri: "/.netlify/functions/todolist"
-  // uri: "https://ahm-todoapp.netlify.app/.netlify/functions/graphql"
+  // uri: "https://ahm-todoapp.netlify.app/.netlify/functions/todolist"
 });
 
 export const client = new ApolloClient({

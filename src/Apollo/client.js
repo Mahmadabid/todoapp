@@ -1,6 +1,7 @@
 const React = require("react");
 const {setContext} = require('apollo-link-context');
 const netlifyIdentity = require("netlify-identity-widget");
+const fetch = require('cross-fetch');
 
 const {
   ApolloClient,
@@ -23,7 +24,8 @@ const authLink = setContext((_, {headers}) => {
 
 const httpLink = new HttpLink({
   // uri: "/.netlify/functions/todolist"
-  uri: "https://ahm-todoapp.netlify.app/.netlify/functions/todolist"
+  uri: "https://ahm-todoapp.netlify.app/.netlify/functions/todolist",
+  fetch,
 });
 
 export const client = new ApolloClient({

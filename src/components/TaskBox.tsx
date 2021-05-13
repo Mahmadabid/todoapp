@@ -104,7 +104,6 @@ const TaskBox= () => {
   }
 
   if (error) {
-    console.log(error);
     return (
       <Layout>
         <SEO title="Todo" />

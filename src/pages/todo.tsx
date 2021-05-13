@@ -11,7 +11,7 @@ const LoggedOut = () => {
     <Layout>
       <SEO title="Home" />
       <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        <h1>Oops!</h1>
+        <h1>Create Todos</h1>
         <p>You are not logged In.</p>
         <p>LogIn to create Todos</p>
         <LogInButton />

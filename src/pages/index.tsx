@@ -14,7 +14,7 @@ const index = () => {
       <Layout>
         <SEO title="Home" />
         <div>
-          <h1>Sorry!</h1>
+          <h1>Welcome</h1>
           <p>You must be logged in to create Todos.</p>
           <p>Todos keep track of your daily tasks.</p>
           <ul>

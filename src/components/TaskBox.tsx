@@ -69,14 +69,17 @@ interface Info {
 
 const TaskBox= () => {
   const classes = useStyles();
-  const { loading, error, data } = useQuery(GET_TODO);
+  const { loading, data, error, refetch } = useQuery(GET_TODO);
   const islit = useSelector((state: State) => state.themes.value);
   const matches = useMediaQuery('(max-width:380px)');
   const [value, setValue] = useState("");
   const [AddTodo, { loading: AddLoading }] = useMutation(ADD_TODO);
+  
+  //States to fetch loading from mutation
   const [CheckLoading, setCheckLoading] = useState(false);
   const [DelLoading, setDelLoading] = useState(false);
   const [UpdateLoading, setUpdateLoading] = useState(false);
+  
   const [Error, setError] = useState(false);
 
   const AddTask = (event: React.FormEvent) => {
@@ -94,11 +97,20 @@ const TaskBox= () => {
     }
   }
 
+// A Circular spinner for Loading
+  const Load = () => {
+    return (
+      <div className="loading">
+        <CircularProgress />
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <Layout>
         <SEO title="Todo" />
-        <h1>Loading...</h1>
+        <Load />
       </Layout>
     );
   }
@@ -110,14 +122,6 @@ const TaskBox= () => {
         <h3>Error, Please try again later</h3>
       </Layout>
     );
-  }
-
-  const Load = () => {
-    return (
-      <div className="loading">
-        <CircularProgress />
-      </div>
-    )
   }
 
   if (data) {
@@ -134,6 +138,7 @@ const TaskBox= () => {
             <Button type="submit" className={`button ${classes.button}`} variant="contained" color="primary">ADD TASK</Button>
           </div>
         </form>
+        <Button onClick={()=>{refetch()}} className={`button ${classes.button}`} variant="contained" color="primary">Reload</Button>
         { data.todos && data.todos.map((info: Info, index: number) =>
           <List key={index} className={`${matches ? classes.rootQuery : classes.root} ${classes.list} ${islit ? classes.LightList : ''} `}>
             <Task setCheckLoading={setCheckLoading} setDelLoading={setDelLoading} setUpdateLoading={setUpdateLoading} date={info.date} task={info.task} id={info.id} status={info.status} />
